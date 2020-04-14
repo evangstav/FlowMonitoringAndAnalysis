@@ -9,6 +9,8 @@ python = "^3.8"
 torch = "^1.4.0"
 flask = "^1.1.2"
 gunicorn = "^20.0.4"
+jedi = "^0.16.0"
+pytorch_lightning = "^0.7.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"
