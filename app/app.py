@@ -61,3 +61,6 @@ def predict():
 @app.errorhandler(werkzeug.exceptions.BadRequest)
 def handle_bad_request(e):
     return jsonify({"error": "bad request!"}), 400
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
