@@ -1,34 +1,37 @@
-# import libraries
-from vidgear.gears import NetGear
+import socket
 import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-# define netgear client with `receive_mode = True` and default settings
-client = NetGear(receive_mode=True, address="10.0.0.1", port=1234)
+HOSTNAME = socket.gethostname()
+PORT = 5009
+HEADER_SIZE = 20
 
-# infinite loop
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOSTNAME, PORT))
+
 while True:
-    print("Started Streaming")
-    # receive frames from network
-    frame = client.recv()
+    full_msg = ""
+    new_message = True
+    while True:
+        data = s.recv(500000)
+        # print(data)
+        np_data = np.frombuffer(data, np.uint8)
+        frame = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
+        cv2.imshow("frame", frame)
+        cv2.waitKey()
 
-    # check if frame is None
-    if frame is None:
-        print("No frame")
-        # if True break the infinite loop
-        break
+        # if new_message:
+        # print(f"new_message length: {msg[:HEADER_SIZE]}")
+        # msglen = int(msg[:HEADER_SIZE])
+        # new_message = False
 
-    # do something with frame here
-    print("Receive Frame")
-    # Show output window
-    # cv2.imshow("Output Frame", frame)
+        # # print("full message length: ", msg[:HEADER_SIZE])
+        # full_msg += msg.decode("utf-8")
+        # # print(len(full_msg))
 
-    key = cv2.waitKey(1) & 0xFF
-    # check for 'q' key-press
-    if key == ord("q"):
-        # if 'q' key-pressed break out
-        break
-
-# close output window
-cv2.destroyAllWindows()
-# safely close client
-client.close()
+        # if len(full_msg) - HEADER_SIZE == msglen:
+        # print("Full message received")
+        # # print(full_msg[HEADER_SIZE:])
+        # new_message = True
+        #     full_msg = ""
