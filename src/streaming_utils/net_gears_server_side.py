@@ -1,14 +1,29 @@
 # import libraries
 from vidgear.gears import VideoGear
 from vidgear.gears import NetGear
+from datetime import datetime as dt
+import argparse
+
+# Instantiate the parser
+parser = argparse.ArgumentParser(description="Serve Video to certain IP")
+# Optional argument
+parser.add_argument(
+    "--address",
+    type=str,
+    default="0.0.0.0",
+)
+
+# Parse
+args = parser.parse_args()
 
 stream = VideoGear(
     resolution=(1920, 1080),
     source="/home/evangelos/Videos/Cat.mp4").start()  # Open any video stream
 server = NetGear(
     # address should be client side address
-    address="10.0.0.2",
-    protocol="tcp",
+    address=args.address,
+    logging=True,
+    protocol="udp",
 )  # Define netgear server with default settings
 
 # infinite loop until [Ctrl+C] is pressed
@@ -23,9 +38,11 @@ while True:
             break
 
         # do something with frame here
+        meta = dt.utcnow().strftime("%s")
 
         # send frame to server
-        server.send(frame)
+        # print(frame)
+        server.send(frame, message=meta)
 
     except KeyboardInterrupt:
         # break the infinite loop
