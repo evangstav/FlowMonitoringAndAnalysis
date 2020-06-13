@@ -1,4 +1,5 @@
 # import libraries
+import time
 from vidgear.gears import VideoGear
 from vidgear.gears import NetGear
 from datetime import datetime as dt
@@ -18,7 +19,10 @@ args = parser.parse_args()
 
 stream = VideoGear(
     resolution=(1920, 1080),
-    source="/home/evangelos/Videos/Cat.mp4").start()  # Open any video stream
+    framerate=10,
+    time_delay=0.5,
+    source="/home/evangelos/Videos/Cat.mp4",
+).start()  # Open any video stream
 server = NetGear(
     # address should be client side address
     address=args.address,
@@ -38,11 +42,11 @@ while True:
             break
 
         # do something with frame here
-        meta = dt.utcnow().strftime("%s")
+        timestamp = time.time_ns()
 
         # send frame to server
         # print(frame)
-        server.send(frame, message=meta)
+        server.send(frame, message=timestamp)
 
     except KeyboardInterrupt:
         # break the infinite loop
