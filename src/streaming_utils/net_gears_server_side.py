@@ -9,19 +9,14 @@ import argparse
 parser = argparse.ArgumentParser(description="Serve Video to certain IP")
 # Optional argument
 parser.add_argument(
-    "--address",
-    type=str,
-    default="0.0.0.0",
+    "--address", type=str, default="0.0.0.0",
 )
 
 # Parse
 args = parser.parse_args()
 
 stream = VideoGear(
-    resolution=(1920, 1080),
-    framerate=10,
-    time_delay=0.5,
-    source="/home/evangelos/Videos/Cat.mp4",
+    resolution=(1920, 1080), source="/home/evangelos/Videos/Cat.mp4",
 ).start()  # Open any video stream
 server = NetGear(
     # address should be client side address
@@ -43,6 +38,7 @@ while True:
 
         # do something with frame here
         timestamp = time.time_ns()
+        print(timestamp)
 
         # send frame to server
         # print(frame)
