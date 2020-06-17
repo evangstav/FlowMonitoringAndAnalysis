@@ -4,6 +4,7 @@ from vidgear.gears import NetGear
 import cv2
 import uuid
 from influxdb import InfluxDBClient
+import argparse
 
 # define netgear client with `receive_mode = True` and default settings
 # address should be client side address
@@ -15,16 +16,17 @@ client = NetGear(logging=True, protocol="udp", receive_mode=True, **options)
 
 # influxdb setup
 influxdb_client = InfluxDBClient(host="localhost", port=8086)
-influxdb_client.create_database("Test Database")
-measurement_name = "Client"
-batch_size = 100
+# Creates the database if it doesnt' exist
+influxdb_client.create_database("MainDatabase")
+measurement_name = "Cat"
+batch_size = 50
 influx_data = []
 # infinite loop
 tic = time.time()
 while True:
     id = str(uuid.uuid4())
-    print(len(influx_data))
     if len(influx_data) > batch_size:
+        print(influx_data)
         influxdb_client.write_points(
             influx_data,
             database="Test Database",
@@ -34,7 +36,11 @@ while True:
         )
         influx_data = []
     # add random delay
-    random_delay = time.sleep(np.random.random() / 11)
+    if np.random.random() > 0.5:
+        random_delay = np.random.random() / 11
+        time.sleep(random_delay)
+    else:
+        random_delay = 0
     # receive frames from network
     data = client.recv()
     if data is None:
@@ -61,7 +67,7 @@ while True:
 
     # store data
     influx_data.append(
-        f"{measurement_name},random_delay={random_delay},id={id} fps={fps},delay={delay} {int(time.time()*1000)}"
+        f"{measurement_name},random_delay={random_delay},id={id} fps={fps},delay={delay} {int(time.time()*1000)}" #data rate
     )
 
     # Show output window
