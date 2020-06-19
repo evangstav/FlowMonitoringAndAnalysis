@@ -17,25 +17,13 @@ def myNetwork():
     net = Mininet(topo=None, build=False, ipBase="10.0.0.0/8")
 
     info("*** Adding controller\n")
-    c3 = net.addController(name="c3",
-                           controller=Controller,
-                           protocol="tcp",
-                           port=6636)
+    c3 = net.addController(name="c3", controller=Controller, protocol="tcp", port=6636)
 
-    c0 = net.addController(name="c0",
-                           controller=Controller,
-                           protocol="tcp",
-                           port=6633)
+    c0 = net.addController(name="c0", controller=Controller, protocol="tcp", port=6633)
 
-    c2 = net.addController(name="c2",
-                           controller=Controller,
-                           protocol="tcp",
-                           port=6635)
+    c2 = net.addController(name="c2", controller=Controller, protocol="tcp", port=6635)
 
-    c1 = net.addController(name="c1",
-                           controller=Controller,
-                           protocol="tcp",
-                           port=6634)
+    c1 = net.addController(name="c1", controller=Controller, protocol="tcp", port=6634)
 
     info("*** Add switches\n")
     s9 = net.addSwitch("s9", cls=OVSKernelSwitch)
@@ -95,6 +83,8 @@ def myNetwork():
     net.addLink(s3, s6, cls=TCLink, **s3s6)
     net.addLink(s9, s10)
 
+    # # Adding NAT
+    # net.addNAT().configDefault()
     info("*** Starting network\n")
     net.build()
     info("*** Starting controllers\n")

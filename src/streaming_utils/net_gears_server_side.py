@@ -1,9 +1,10 @@
 # import libraries
 import time
-from vidgear.gears import VideoGear
+from vidgear.gears import VideoGear, CamGear
 from vidgear.gears import NetGear
 from datetime import datetime as dt
 import argparse
+import cv2
 
 # Instantiate the parser
 parser = argparse.ArgumentParser(description="Serve Video to certain IP")
@@ -11,18 +12,18 @@ parser = argparse.ArgumentParser(description="Serve Video to certain IP")
 parser.add_argument(
     "--address", type=str, default="0.0.0.0",
 )
-
 # Parse
 args = parser.parse_args()
-
-stream = VideoGear(
-    resolution=(1920, 1080), source="/home/evangelos/Videos/Cat.mp4",
+source = "udpsrc port=5000 ! application/x-rtp,media=video,encoding-name=JPEG! rtpjpegdepay ! jpegdec ! videoconvert !video/x-raw, format=BGR !appsink"
+# source = "rtsp://192.168.20.7:5000/"
+stream = CamGear(
+    source=source, backend="1800", logging=True
 ).start()  # Open any video stream
 server = NetGear(
     # address should be client side address
     address=args.address,
     logging=True,
-    protocol="udp",
+    protocol="tcp",
 )  # Define netgear server with default settings
 
 # infinite loop until [Ctrl+C] is pressed

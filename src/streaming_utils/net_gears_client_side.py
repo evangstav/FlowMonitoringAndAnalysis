@@ -18,7 +18,7 @@ parser.add_argument(
     "--influxdb_port", type=int, default=8086,
 )
 parser.add_argument(
-    "--delay_prob", type=float, default=0.5,
+    "--delay_prob", type=float, default=0.0,
 )
 # Parse
 args = parser.parse_args()
@@ -54,7 +54,7 @@ while True:
         )
         influx_data = []
     # add random delay
-    if np.random.random() > args.delay_prob:
+    if np.random.random() < args.delay_prob:
         random_delay = round(np.random.random() / 10, 2)
         time.sleep(random_delay)
     else:
@@ -85,7 +85,7 @@ while True:
 
     # Measured Delay
     delay = (time.time_ns() - received_timestamp) / 1e6  # to milliseconds
-    print(f"Delay: {delay} ms")
+    # print(f"Delay: {delay} ms")
     # do something with frame here
     # print(int(meta) - int(dt.utcnow().strftime("%s")))
 

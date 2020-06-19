@@ -1,5 +1,6 @@
 import subprocess
 import time
+import argparse
 
 
 class DataRate:
@@ -26,7 +27,10 @@ class DataRate:
 
 
 if __name__ == "__main__":
-    data_rate = DataRate()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--interface", default="lo")
+    args = parser.parse_args()
+    data_rate = DataRate(interface=args.interface)
     while True:
         rate = data_rate.get_data_rate()
         print("Throughput: " + str(rate) + " Mbps.")
