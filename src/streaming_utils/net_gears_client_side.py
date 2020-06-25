@@ -20,6 +20,9 @@ parser.add_argument(
 parser.add_argument(
     "--delay_prob", type=float, default=0.0,
 )
+parser.add_argument("--db_present", type=eval, choices=[True, False], default="True")
+
+parser.add_argument("--interface", type=str, default="lo")
 # Parse
 args = parser.parse_args()
 
@@ -29,12 +32,13 @@ args = parser.parse_args()
 options = {"bidirectional_mode": True}  # needed to pass message
 
 client = NetGear(logging=True, protocol="udp", receive_mode=True, **options)
-data_rate = DataRate()
+data_rate = DataRate(interface=args.interface)
 
 # influxdb setup
-influxdb_client = InfluxDBClient(host=args.influxdb_host, port=args.influxdb_port)
-# Creates the database if it doesnt' exist
-influxdb_client.create_database("MainDatabase")
+if args.db_present:
+    influxdb_client = InfluxDBClient(host=args.influxdb_host, port=args.influxdb_port)
+    # Creates the database if it doesnt' exist
+    influxdb_client.create_database("MainDatabase")
 measurement_name = "Cat"
 batch_size = 80
 influx_data = []
@@ -45,13 +49,14 @@ while True:
     id = str(uuid.uuid4())
     if len(influx_data) > batch_size:
         # print(influx_data)
-        influxdb_client.write_points(
-            influx_data,
-            database="MainDatabase",
-            batch_size=batch_size,
-            time_precision="u",  # micro secs
-            protocol="line",
-        )
+        if args.db_present:
+            influxdb_client.write_points(
+                influx_data,
+                database="MainDatabase",
+                batch_size=batch_size,
+                time_precision="u",  # micro secs
+                protocol="line",
+            )
         influx_data = []
     # add random delay
     if np.random.random() < args.delay_prob:
@@ -76,7 +81,7 @@ while True:
 
     # receive frame and timestamp
     received_timestamp, frame = data
-    print(received_timestamp)
+    # print(received_timestamp)
 
     # check if frame is None
     if frame is None:
@@ -93,6 +98,7 @@ while True:
     influx_data.append(
         f"{measurement_name},random_delay={random_delay} fps={fps},delay={delay},data_rate={rx_rate}"  # data rate
     )
+    print(f"random_delay={random_delay} fps={fps},delay={delay},data_rate={rx_rate}")
 
     # Show output window
     cv2.imshow("Output Frame", frame)

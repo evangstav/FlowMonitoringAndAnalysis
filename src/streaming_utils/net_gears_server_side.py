@@ -12,13 +12,20 @@ parser = argparse.ArgumentParser(description="Serve Video to certain IP")
 parser.add_argument(
     "--address", type=str, default="0.0.0.0",
 )
+
+parser.add_argument(
+    "--source", type=str, default="test",
+)
 # Parse
 args = parser.parse_args()
 source = "udpsrc port=5000 ! application/x-rtp,media=video,encoding-name=JPEG! rtpjpegdepay ! jpegdec ! videoconvert !video/x-raw, format=BGR !appsink"
-# source = "rtsp://192.168.20.7:5000/"
-stream = CamGear(
-    source=source, backend="1800", logging=True
-).start()  # Open any video stream
+if args.source == "test":
+    # test on a local video
+    stream = VideoGear(source="/home/evangelos/Videos/Cat.mp4").start()
+else:
+    stream = CamGear(
+        source=source, backend="1800", logging=True
+    ).start()  # Open any video stream
 server = NetGear(
     # address should be client side address
     address=args.address,

@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# openv-cv-lbs
+/opencv
+/opencv_contrib
+
